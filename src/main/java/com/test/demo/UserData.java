@@ -8,8 +8,7 @@ import lombok.Value;
 @Builder
 public class UserData {
 	private String name;
-	private String cognome;
-	private String indirizzo;
+	private String surname;
 	private String email;
 	private String password;
 
