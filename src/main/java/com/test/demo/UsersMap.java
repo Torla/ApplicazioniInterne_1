@@ -2,6 +2,7 @@ package com.test.demo;
 
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.Email;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -11,7 +12,12 @@ import java.util.concurrent.ConcurrentHashMap;
 public class UsersMap {
 	private ConcurrentHashMap<String,UserData> map = new ConcurrentHashMap<>();
 
-	public void addUser(String name,String surname,String email,String psw){
+	public class EmailAlreadyExist extends Exception{}
+
+	public void addUser(String name,String surname,String email,String psw) throws EmailAlreadyExist {
+		if(map.containsKey(email)){
+			throw new EmailAlreadyExist();
+		}
 		UserData userData = UserData.builder()
 				.name(name)
 				.surname(surname)
