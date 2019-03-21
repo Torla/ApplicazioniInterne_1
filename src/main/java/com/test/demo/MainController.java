@@ -10,7 +10,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
 
-import javax.validation.Valid;
+import javax.validation.*;
+import java.util.Set;
+import java.util.concurrent.locks.StampedLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,8 +24,6 @@ public class MainController {
 
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	static final Pattern VALID_EMAIL_ADDRESS_REGEX = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
-
 	@GetMapping("/register")
 	public String home(){
 		return "register";
@@ -31,13 +31,15 @@ public class MainController {
 	@PostMapping("/register")
 	public String index(@Valid RegistrationVM vm, BindingResult res, Model m){
 		logger.info(vm.toString());
-		if(!vm.password.equals(vm.passwordConf)){
-			m.addAttribute("errorMsg","passwords not matching");
+		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+		Validator validator = factory.getValidator();
+		Set<ConstraintViolation<RegistrationVM>> violations = validator.validate(vm);
+		if(!violations.isEmpty()){
+			m.addAttribute("errorMsg",violations.iterator().next().getMessage());
 			return "register";
 		}
-		Matcher matcher = VALID_EMAIL_ADDRESS_REGEX .matcher(vm.email);
-		if(!matcher.find()) {
-			m.addAttribute("errorMsg","email not valid");
+		if(!vm.password.equals(vm.passwordConf)){
+			m.addAttribute("errorMsg","passwords not matching");
 			return "register";
 		}
 		try {
