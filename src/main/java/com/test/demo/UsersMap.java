@@ -4,11 +4,12 @@ import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 @Component
 public class UsersMap {
-	private Map<String,UserData> map = new HashMap<>();
+	private ConcurrentHashMap<String,UserData> map = new ConcurrentHashMap<>();
 
 	public void addUser(String name,String surname,String email,String psw){
 		UserData userData = UserData.builder()
