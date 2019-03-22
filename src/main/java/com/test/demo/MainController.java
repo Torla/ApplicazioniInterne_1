@@ -51,8 +51,9 @@ public class MainController {
 		} catch (UsersMap.EmailAlreadyExist emailAlreadyExist) {
 			m.addAttribute("errorMsg","emailAlreadyExist");
 		}
-		return "register";
-	} //todo redirect to login after registration
+		m.addAttribute("redirect","login");
+		return "redirect";
+	}
 
 	@GetMapping("/login")
 	public String login(){return "login";}
