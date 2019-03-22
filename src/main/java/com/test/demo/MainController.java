@@ -67,18 +67,18 @@ public class MainController {
 			m.addAttribute("errorMsg",violations.iterator().next().getMessage());
 			return "login";
 		}
-		UserData user;
+
 		try {
-			user = users.getUserData(vm.email);
+			users.checkLogin(vm.email,vm.password);
+			m.addAttribute("name",users.getUserData(vm.email).getName());
 		} catch (UsersMap.EmailDoesntExist emailDoesntExist) {
 			m.addAttribute("errorMsg","email doesn't exist");
 			return "login";
-		}
-		if(!user.getPassword().equals(vm.password)){
-			m.addAttribute("errorMsg","wrong password");
+		} catch (UsersMap.WrongPassword wrongPassword) {
+			m.addAttribute("errorMsg","Wrong Password ");
 			return "login";
 		}
-		m.addAttribute("name",user.getName());
+
 		return "privatePage";
 	}
 }
