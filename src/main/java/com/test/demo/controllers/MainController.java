@@ -10,7 +10,9 @@ import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import javax.validation.Valid;
@@ -30,37 +32,27 @@ public class MainController {
   }
 
   @GetMapping("/register")
-  public String register () {
+  public String register (@ModelAttribute("vm") RegistrationVM vm) {
     return "register";
   }
 
   @PostMapping("/register")
-  public String registerForm (@Valid RegistrationVM vm, BindingResult res, Model m) {
+  public String registerForm (@Valid @ModelAttribute("vm") RegistrationVM vm, BindingResult res) {
     logger.info(vm.toString());
 
-    m.addAttribute("user", vm.user);
-    m.addAttribute("surname", vm.surname);
-    m.addAttribute("email", vm.email);
-
-    List<String> violations = res.getAllErrors()
-        .stream()
-        .map(DefaultMessageSourceResolvable::getDefaultMessage)
-        .collect(Collectors.toList());
-
-    if (!violations.isEmpty()) {
-      m.addAttribute("errorMsg", violations.get(0));
+    if (res.hasErrors()) {
       return "register";
     }
 
     if (!vm.password.equals(vm.passwordConf)) {
-      m.addAttribute("errorMsg", "passwords not matching");
+      res.addError(new FieldError("vm", "password", "password not matching"));
       return "register";
     }
 
     try {
-      users.addUser(vm.user, vm.surname, vm.email, vm.password);
+      users.addUser(vm.name, vm.surname, vm.email, vm.password);
     } catch (UsersMap.EmailAlreadyExist emailAlreadyExist) {
-      m.addAttribute("errorMsg", "emailAlreadyExist");
+      res.addError(new FieldError("vm", "email", vm.email + " already exists"));
       return "register";
     }
 
