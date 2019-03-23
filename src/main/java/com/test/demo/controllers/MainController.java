@@ -35,22 +35,37 @@ public class MainController {
   @PostMapping("/register")
   public String registerForm (@Valid RegistrationVM vm, BindingResult res, Model m) {
     logger.info(vm.toString());
+
     ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
     Validator validator = factory.getValidator();
     Set<ConstraintViolation<RegistrationVM>> violations = validator.validate(vm);
-    if (! violations.isEmpty()) {
+
+    if (!violations.isEmpty()) {
       m.addAttribute("errorMsg", violations.iterator().next().getMessage());
+      m.addAttribute("user", vm.user);
+      m.addAttribute("surname", vm.surname);
+      m.addAttribute("email", vm.email);
       return "register";
     }
-    if (! vm.password.equals(vm.passwordConf)) {
+
+    if (!vm.password.equals(vm.passwordConf)) {
       m.addAttribute("errorMsg", "passwords not matching");
+      m.addAttribute("user", vm.user);
+      m.addAttribute("surname", vm.surname);
+      m.addAttribute("email", vm.email);
       return "register";
     }
+
     try {
       users.addUser(vm.user, vm.surname, vm.email, vm.password);
     } catch (UsersMap.EmailAlreadyExist emailAlreadyExist) {
       m.addAttribute("errorMsg", "emailAlreadyExist");
+      m.addAttribute("user", vm.user);
+      m.addAttribute("surname", vm.surname);
+      m.addAttribute("email", vm.email);
+      return "register";
     }
+
     m.addAttribute("redirect", "login");
     return "redirect";
   }
