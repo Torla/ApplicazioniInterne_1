@@ -6,7 +6,6 @@ import com.test.demo.db.UsersMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -16,8 +15,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import javax.validation.Valid;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Controller
 public class MainController {
@@ -45,7 +42,7 @@ public class MainController {
     }
 
     if (!vm.password.equals(vm.passwordConf)) {
-      res.addError(new FieldError("vm", "password", "password not matching"));
+      res.addError(new FieldError("vm", "password", "Password not matching"));
       return "register";
     }
 
@@ -60,23 +57,15 @@ public class MainController {
   }
 
   @GetMapping("/login")
-  public String login () {
+  public String login (@ModelAttribute("vm") LoginVM vm) {
     return "login";
   }
 
   @PostMapping("/login")
-  public String loginForm (@Valid LoginVM vm, BindingResult res, Model m) {
+  public String loginForm (@Valid @ModelAttribute("vm") LoginVM vm, BindingResult res, Model m) {
     logger.info(vm.toString());
 
-    m.addAttribute("email", vm.email);
-
-    List<String> violations = res.getAllErrors()
-        .stream()
-        .map(DefaultMessageSourceResolvable::getDefaultMessage)
-        .collect(Collectors.toList());
-
-    if (!violations.isEmpty()) {
-      m.addAttribute("errorMsg", violations.get(0));
+    if (res.hasErrors()) {
       return "login";
     }
 
@@ -84,10 +73,10 @@ public class MainController {
       users.checkLogin(vm.email, vm.password);
       m.addAttribute("name", users.getUserData(vm.email).getName());
     } catch (UsersMap.EmailDoesntExist emailDoesntExist) {
-      m.addAttribute("errorMsg", "email doesn't exist");
+      res.addError(new FieldError("vm", "email", vm.email + " doesn't exist"));
       return "login";
     } catch (UsersMap.WrongPassword wrongPassword) {
-      m.addAttribute("errorMsg", "Wrong Password ");
+      res.addError(new FieldError("vm", "password", "Wrong password"));
       return "login";
     }
 
