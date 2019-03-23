@@ -2,6 +2,7 @@ package com.test.demo.ViewModels;
 
 import lombok.Data;
 
+import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Size;
 
@@ -18,4 +19,6 @@ public class RegistrationVM {
   public String password;
   @Size(min = 5, max = 15)
   public String passwordConf;
+  @AssertTrue(message = "Privacy consent must be granted")
+  public boolean privacyConsent;
 }
