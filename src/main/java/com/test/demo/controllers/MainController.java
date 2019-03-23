@@ -77,6 +77,8 @@ public class MainController {
   public String loginForm (@Valid LoginVM vm, BindingResult res, Model m) {
     logger.info(vm.toString());
 
+    m.addAttribute("email", vm.email);
+
     List<String> violations = res.getAllErrors()
         .stream()
         .map(DefaultMessageSourceResolvable::getDefaultMessage)
