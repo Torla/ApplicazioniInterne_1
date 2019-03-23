@@ -64,8 +64,7 @@ public class MainController {
       return "register";
     }
 
-    m.addAttribute("redirect", "login");
-    return "redirect";
+    return "redirect:/login";
   }
 
   @GetMapping("/login")
