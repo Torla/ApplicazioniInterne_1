@@ -12,7 +12,7 @@
     <div class="container-fluid">
         <h1>Sign in</h1>
         <div class = "row">
-            <form action="#" th:action="@{/login}" th:object="${vm}" method="post">
+            <form action="#" th:action="@{/login}" th:object="${loginVM}" method="post">
                 <div class="form-group">
                     <label for="e">email</label>
                     <input type="text" name="email" th:field="*{email}" id="e" placeholder="email">

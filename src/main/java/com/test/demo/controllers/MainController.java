@@ -29,12 +29,12 @@ public class MainController {
   }
 
   @GetMapping("/register")
-  public String register (@ModelAttribute("vm") RegistrationVM vm) {
+  public String register () {
     return "register";
   }
 
   @PostMapping("/register")
-  public String registerForm (@Valid @ModelAttribute("vm") RegistrationVM vm, BindingResult res) {
+  public String registerForm (@Valid @ModelAttribute("registrationVM") RegistrationVM vm, BindingResult res) {
     logger.info(vm.toString());
 
     if (res.hasErrors()) {
@@ -42,14 +42,23 @@ public class MainController {
     }
 
     if (!vm.password.equals(vm.passwordConf)) {
-      res.addError(new FieldError("vm", "password", "Password not matching"));
+      res.addError(new FieldError("registrationVM", "password", "Password not matching"));
       return "register";
     }
 
     try {
       users.addUser(vm.name, vm.surname, vm.email, vm.password);
     } catch (UsersMap.EmailAlreadyExist emailAlreadyExist) {
-      res.addError(new FieldError("vm", "email", vm.email + " already exists"));
+      res.addError(
+          new FieldError(
+              "registrationVM",
+              "email",
+              vm.email,
+              false,
+              null,
+              null,
+              vm.email + " already exists")
+      );
       return "register";
     }
 
@@ -57,12 +66,12 @@ public class MainController {
   }
 
   @GetMapping("/login")
-  public String login (@ModelAttribute("vm") LoginVM vm) {
+  public String login () {
     return "login";
   }
 
   @PostMapping("/login")
-  public String loginForm (@Valid @ModelAttribute("vm") LoginVM vm, BindingResult res, Model m) {
+  public String loginForm (@Valid @ModelAttribute("loginVM") LoginVM vm, BindingResult res, Model m) {
     logger.info(vm.toString());
 
     if (res.hasErrors()) {
@@ -73,13 +82,32 @@ public class MainController {
       users.checkLogin(vm.email, vm.password);
       m.addAttribute("name", users.getUserData(vm.email).getName());
     } catch (UsersMap.EmailDoesntExist emailDoesntExist) {
-      res.addError(new FieldError("vm", "email", vm.email + " doesn't exist"));
+      res.addError(
+          new FieldError(
+              "registrationVM",
+              "email",
+              vm.email,
+              false,
+              null,
+              null,
+              vm.email + " doesnt exists")
+      );
       return "login";
     } catch (UsersMap.WrongPassword wrongPassword) {
-      res.addError(new FieldError("vm", "password", "Wrong password"));
+      res.addError(new FieldError("loginVM", "password", "Wrong password"));
       return "login";
     }
 
     return "privatePage";
+  }
+
+  @ModelAttribute("registrationVM")
+  public RegistrationVM getRegistrationVM () {
+    return new RegistrationVM();
+  }
+
+  @ModelAttribute("loginVM")
+  public LoginVM getLoginVM () {
+    return new LoginVM();
   }
 }
