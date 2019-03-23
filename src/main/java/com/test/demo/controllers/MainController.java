@@ -13,9 +13,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import javax.validation.*;
+import javax.validation.Valid;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Controller
@@ -77,11 +76,14 @@ public class MainController {
   @PostMapping("/login")
   public String loginForm (@Valid LoginVM vm, BindingResult res, Model m) {
     logger.info(vm.toString());
-    ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-    Validator validator = factory.getValidator();
-    Set<ConstraintViolation<LoginVM>> violations = validator.validate(vm);
-    if (! violations.isEmpty()) {
-      m.addAttribute("errorMsg", violations.iterator().next().getMessage());
+
+    List<String> violations = res.getAllErrors()
+        .stream()
+        .map(DefaultMessageSourceResolvable::getDefaultMessage)
+        .collect(Collectors.toList());
+
+    if (!violations.isEmpty()) {
+      m.addAttribute("errorMsg", violations.get(0));
       return "login";
     }
 
