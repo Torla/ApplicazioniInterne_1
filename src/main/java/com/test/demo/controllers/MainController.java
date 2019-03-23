@@ -1,5 +1,8 @@
-package com.test.demo;
+package com.test.demo.controllers;
 
+import com.test.demo.ViewModels.LoginVM;
+import com.test.demo.ViewModels.RegistrationVM;
+import com.test.demo.db.UsersMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,9 +15,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import javax.validation.*;
 import java.util.Set;
-import java.util.concurrent.locks.StampedLock;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Controller
 public class MainController {

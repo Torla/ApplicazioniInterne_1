@@ -1,11 +1,11 @@
-package com.test.demo;
+package com.test.demo.ViewModels;
 
 
 import lombok.Data;
 
 
 @Data
-public class UserData {
+public class UserDataVM {
 	private String name;
 	private String surname;
 	private String email;

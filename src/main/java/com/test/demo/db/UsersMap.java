@@ -1,18 +1,16 @@
-package com.test.demo;
+package com.test.demo.db;
 
+import com.test.demo.ViewModels.UserDataVM;
 import org.springframework.stereotype.Component;
 
-import javax.validation.constraints.Email;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 
 @Component
 public class UsersMap {
-	private ConcurrentHashMap<String,UserData> map = new ConcurrentHashMap<>();
+	private ConcurrentHashMap<String, UserDataVM> map = new ConcurrentHashMap<>();
 
 	public class EmailAlreadyExist extends Exception{}
 	public class EmailDoesntExist extends Exception{}
@@ -46,7 +44,7 @@ public class UsersMap {
 		}
 
 
-		UserData userData = new  UserData();
+		UserDataVM userData = new UserDataVM();
 		userData.setEmail(email);
 		userData.setName(name);
 		userData.setPassword(pswDigest(psw));
@@ -55,13 +53,13 @@ public class UsersMap {
 		System.out.println(map);
 	}
 
-	public UserData getUserData(String email) throws EmailDoesntExist {
+	public UserDataVM getUserData(String email) throws EmailDoesntExist {
 		if(!map.containsKey(email)) throw new EmailDoesntExist();
 		return map.get(email);
 	}
 
 	public void checkLogin(String email,String psw) throws EmailDoesntExist, WrongPassword {
-		UserData userData = getUserData(email);
+		UserDataVM userData = getUserData(email);
 		if(!userData.getPassword().equals(pswDigest(psw))) throw new WrongPassword();
 
 	}
