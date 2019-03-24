@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import javax.validation.Valid;
+import java.util.Random;
 
 @Controller
 public class MainController {
@@ -81,6 +82,8 @@ public class MainController {
     try {
       users.checkLogin(vm.email, vm.password);
       m.addAttribute("name", users.getUserData(vm.email).getName());
+      String imageNumber = String.valueOf(new Random().nextInt(4));
+      m.addAttribute("imageNumber", imageNumber);
     } catch (UsersMap.EmailDoesntExist emailDoesntExist) {
       res.addError(
           new FieldError(
