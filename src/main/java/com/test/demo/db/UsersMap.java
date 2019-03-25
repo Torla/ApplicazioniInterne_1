@@ -1,6 +1,7 @@
 package com.test.demo.db;
 
 import com.test.demo.ViewModels.UserDataVM;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.security.MessageDigest;
@@ -10,6 +11,9 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class UsersMap {
   private ConcurrentHashMap<String, UserDataVM> map = new ConcurrentHashMap<>();
+
+  @Autowired
+  private UserDataRepository repository;
 
   public class EmailAlreadyExist extends Exception {
   }
@@ -53,6 +57,7 @@ public class UsersMap {
     userData.setPassword(pswDigest(psw));
     userData.setSurname(surname);
     map.put(userData.getEmail(), userData);
+    repository.save(userData);
     System.out.println(map);
   }
 
