@@ -10,12 +10,15 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class UsersMap {
-  private ConcurrentHashMap<String, UserDataVM> map = new ConcurrentHashMap<>();
 
-  @Autowired
-  private UserDataRepository repository;
+	private final UserDataRepository repository;
 
-  public class EmailAlreadyExist extends Exception {
+	@Autowired
+	public UsersMap(UserDataRepository repository) {
+		this.repository = repository;
+	}
+
+	public class EmailAlreadyExist extends Exception {
   }
 
   public class EmailDoesntExist extends Exception {
@@ -47,7 +50,7 @@ public class UsersMap {
   }
 
   public void addUser (String name, String surname, String email, String psw) throws EmailAlreadyExist {
-    if (map.containsKey(email)) {
+    if (repository.countByEmail(email) != 0) {
       throw new EmailAlreadyExist();
     }
 
@@ -56,18 +59,19 @@ public class UsersMap {
     userData.setName(name);
     userData.setPassword(pswDigest(psw));
     userData.setSurname(surname);
-    map.put(userData.getEmail(), userData);
     repository.save(userData);
-    System.out.println(map);
   }
 
   public UserDataVM getUserData (String email) throws EmailDoesntExist {
-    if (!map.containsKey(email)) throw new EmailDoesntExist();
-    return map.get(email);
+	  UserDataVM userDataVM = repository.findByEmail(email);
+	  if(userDataVM == null) throw new EmailDoesntExist();
+	  return userDataVM;
   }
 
   public void checkLogin (String email, String psw) throws EmailDoesntExist, WrongPassword {
-    UserDataVM userData = getUserData(email);
+
+  	UserDataVM userData = repository.findByEmail(email);
+  	if(userData == null) throw new EmailDoesntExist();
     if (!userData.getPassword().equals(pswDigest(psw))) throw new WrongPassword();
   }
 
