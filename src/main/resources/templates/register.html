@@ -9,44 +9,76 @@
           crossorigin="anonymous">
 </head>
 <body>
-    <div class="container-fluid">
-        <h1>Sign up</h1>
-        <div class = "row">
-                <form action="#" th:action="@{/register}" th:object="${registrationVM}" method="post">
-                    <div class="form-group">
-                        <label for="u">name</label>
-                        <input type="text" name="user" th:field="*{name}" id="u" placeholder="name">
-                        <h3 th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></h3>
-                    </div>
-                    <div class="form-group">
-                        <label for="s">surname</label>
-                        <input type="text" name="surname" th:field="*{surname}" id="s" placeholder="surname">
-                        <h3 th:if="${#fields.hasErrors('surname')}" th:errors="*{surname}"></h3>
-                    </div>
-                    <div class="form-group">
-                        <label for="e">email</label>
-                        <input type="text" name="email" th:field="*{email}" id="e" placeholder="email">
-                        <h3 th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></h3>
-                    </div>
-                    <div class="form-group">
-                        <label for="p">password</label>
-                        <input type="password" name="password" value="" id="p" placeholder="password">
-                        <h3 th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></h3>
-                    </div>
-                    <div class="form-group">
-                        <label for="c">password confirm</label>
-                        <input type="password" name="passwordConf" value="" id="c" placeholder="confirm password">
-                    </div>
-                    <div class="form-group">
-                        <label for="pc">privacy consent</label>
-                        <input type="checkbox" name="privacyConsent" th:field="*{privacyConsent}" id="pc">
-                        <h3 th:if="${#fields.hasErrors('privacyConsent')}" th:errors="*{privacyConsent}"></h3>
-                    </div>
-                    <div>
-                        <input type="submit" value="Register">
-                    </div>
-                </form>
+    <div class="container bg-light p-3">
+        <div class="bg-dark" style="border-radius: 8pt; display: flex; justify-content: center">
+            <h1 class="text-light">Sign up</h1>
         </div>
+        <form action="#" th:action="@{/register}" th:object="${registrationVM}" method="post">
+
+            <div class="row p-2">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" name="user" th:field="*{name}" id="name"
+                               placeholder="name" class="form-control"
+                               th:classappend="${#fields.hasErrors('name')} ? 'is-invalid' : ''">
+                        <div th:if="${#fields.hasErrors('name')}" class="invalid-feedback" th:errors="*{name}"></div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="surname">Surname</label>
+                        <input type="text" name="surname" th:field="*{surname}"
+                               id="surname" placeholder="surname" class="form-control"
+                               th:classappend="${#fields.hasErrors('surname')} ? 'is-invalid' : ''">
+                        <div th:if="${#fields.hasErrors('surname')}" class="invalid-feedback" th:errors="*{surname}"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row p-2">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="text" name="email" th:field="*{email}" id="email"
+                               placeholder="email" class="form-control"
+                               th:classappend="${#fields.hasErrors('email')} ? 'is-invalid' : ''">
+                        <div th:if="${#fields.hasErrors('email')}" class="invalid-feedback" th:errors="*{email}"></div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="privacy">Privacy consent</label><br>
+                        <input type="checkbox" name="privacyConsent" th:field="*{privacyConsent}" id="privacy"
+                               th:classappend="${#fields.hasErrors('privacyConsent')} ? 'is-invalid' : ''"> I agree to blah blah blah...
+                        <div th:if="${#fields.hasErrors('privacyConsent')}" class="invalid-feedback d-block" th:errors="*{privacyConsent}"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row p-2">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" name="password" value="" id="password" placeholder="password" class="form-control"
+                               th:classappend="${#fields.hasErrors('password')} ? 'is-invalid' : ''">
+                        <div th:if="${#fields.hasErrors('password')}" class="invalid-feedback" th:errors="*{password}"></div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="passwordConfirm">Confirm password</label>
+                        <input type="password" name="passwordConf" value="" id="passwordConfirm" placeholder="confirm password"
+                               class="form-control" th:classappend="${#fields.hasErrors('password')} ? 'is-invalid' : ''">
+                    </div>
+                </div>
+            </div>
+
+            <div class="container p-3" style="display: flex; justify-content: center">
+                <input type="submit" value="Register" class="btn btn-lg btn-primary">
+            </div>
+
+        </form>
     </div>
 </body>
 </html>
