@@ -82,7 +82,7 @@ public class MainController {
     try {
       users.checkLogin(vm.email, vm.password);
       m.addAttribute("name", users.getUserData(vm.email).getName());
-      String imageNumber = String.valueOf(new Random().nextInt(4));
+      String imageNumber = String.valueOf(new Random().nextInt(7));
       m.addAttribute("imageNumber", imageNumber);
     } catch (UsersMap.EmailDoesntExist emailDoesntExist) {
       res.addError(
