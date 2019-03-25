@@ -9,22 +9,23 @@
           crossorigin="anonymous">
 </head>
 <body>
-    <div class="container-fluid">
+    <div class="container-fluid p-5">
         <h1>Sign in</h1>
         <div class = "row">
             <form action="#" th:action="@{/login}" th:object="${loginVM}" method="post">
                 <div class="form-group">
-                    <label for="e">email</label>
-                    <input type="text" name="email" th:field="*{email}" id="e" placeholder="email">
+                    <label for="e">Email address</label>
+                    <input type="email" class="form-control" name="email" aria-describedby="emailHelp" th:field="*{email}" id="e" placeholder="email">
+                    <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
                     <h3 th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></h3>
                 </div>
                 <div class="form-group">
-                    <label for="p">password</label>
-                    <input type="password" name="password" value="" id="p" placeholder="password">
+                    <label for="p">Password</label>
+                    <input type="password" class="form-control" name="password" value="" id="p" placeholder="password">
                     <h3 th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></h3>
                 </div>
                 <div>
-                    <input type="submit" value="Register">
+                    <input type="submit" class="btn btn-primary" value="Login">
                 </div>
             </form>
         </div>
