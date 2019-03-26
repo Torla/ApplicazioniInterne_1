@@ -2,6 +2,7 @@ package com.test.demo.controllers;
 
 import com.test.demo.ViewModels.LoginVM;
 import com.test.demo.ViewModels.RegistrationVM;
+import com.test.demo.ViewModels.UserDataVM;
 import com.test.demo.db.UsersMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,10 +11,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.Random;
 
@@ -72,15 +76,17 @@ public class MainController {
   }
 
   @PostMapping("/login")
-  public String loginForm (@Valid @ModelAttribute("loginVM") LoginVM vm, BindingResult res, Model m) {
+  public String loginForm (@Valid @ModelAttribute("loginVM") LoginVM vm, BindingResult res,Model m,HttpServletResponse response) {
     logger.info(vm.toString());
 
     if (res.hasErrors()) {
       return "login";
     }
 
+    Cookie cookie = new Cookie("login",Long.toHexString(new Random().nextLong()));
+
     try {
-      users.checkLogin(vm.email, vm.password);
+      users.checkLogin(vm.email, vm.password,cookie);
       m.addAttribute("name", users.getUserData(vm.email).getName());
       String imageNumber = String.valueOf(new Random().nextInt(7));
       m.addAttribute("imageNumber", imageNumber);
@@ -101,7 +107,22 @@ public class MainController {
       return "login";
     }
 
+    response.addCookie(cookie);
     return "privatePage";
+  }
+
+  @GetMapping("/privatePage")
+  public String privatePage(@CookieValue(value = "login", defaultValue = "0") String cookie,Model m){
+		UserDataVM  userDataVM;
+		try {
+		  userDataVM = users.checkCookie(cookie);
+		} catch (UsersMap.NotLogged notLogged) {
+		  return "login";
+		}
+		m.addAttribute("name", userDataVM.getName());
+		String imageNumber = String.valueOf(new Random().nextInt(7));
+		m.addAttribute("imageNumber", imageNumber);
+		return "privatePage";
   }
 
   @ModelAttribute("registrationVM")

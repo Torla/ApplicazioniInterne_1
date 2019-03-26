@@ -1,21 +1,25 @@
 package com.test.demo.db;
 
+import com.test.demo.Entity.LoginRecord;
 import com.test.demo.ViewModels.UserDataVM;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.Cookie;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.concurrent.ConcurrentHashMap;
+import java.time.LocalDateTime;
 
 @Component
 public class UsersMap {
 
-	private final UserDataRepository repository;
+	private final UserDataRepository UserDataRepository;
+	private final LoginRecordRepository loginRecordRepository;
 
 	@Autowired
-	public UsersMap(UserDataRepository repository) {
-		this.repository = repository;
+	public UsersMap(UserDataRepository repository, LoginRecordRepository loginRecordRepository) {
+		this.UserDataRepository = repository;
+		this.loginRecordRepository = loginRecordRepository;
 	}
 
 	public class EmailAlreadyExist extends Exception {
@@ -25,6 +29,11 @@ public class UsersMap {
   }
 
   public class WrongPassword extends Exception {
+
+  }
+
+  public class NotLogged extends Exception{
+
   }
 
 
@@ -50,7 +59,7 @@ public class UsersMap {
   }
 
   public void addUser (String name, String surname, String email, String psw) throws EmailAlreadyExist {
-    if (repository.countByEmail(email) != 0) {
+    if (UserDataRepository.countByEmail(email) != 0) {
       throw new EmailAlreadyExist();
     }
 
@@ -59,20 +68,30 @@ public class UsersMap {
     userData.setName(name);
     userData.setPassword(pswDigest(psw));
     userData.setSurname(surname);
-    repository.save(userData);
+    UserDataRepository.save(userData);
   }
 
   public UserDataVM getUserData (String email) throws EmailDoesntExist {
-	  UserDataVM userDataVM = repository.findByEmail(email);
+	  UserDataVM userDataVM = UserDataRepository.findByEmail(email);
 	  if(userDataVM == null) throw new EmailDoesntExist();
 	  return userDataVM;
   }
 
-  public void checkLogin (String email, String psw) throws EmailDoesntExist, WrongPassword {
+  public void checkLogin (String email, String psw,Cookie cookie) throws EmailDoesntExist, WrongPassword {
 
-  	UserDataVM userData = repository.findByEmail(email);
+  	UserDataVM userData = UserDataRepository.findByEmail(email);
   	if(userData == null) throw new EmailDoesntExist();
     if (!userData.getPassword().equals(pswDigest(psw))) throw new WrongPassword();
+    LoginRecord loginRecord = new LoginRecord();
+    loginRecord.setEmail(email);
+    loginRecord.setCookie(cookie.getValue());
+    loginRecord.setLocalDateTime(LocalDateTime.now());
+    loginRecordRepository.save(loginRecord);
   }
 
+  public UserDataVM checkCookie(String cookie) throws NotLogged {
+		LoginRecord loginRecord = loginRecordRepository.findByCookie(cookie);
+		if(loginRecord == null) throw new NotLogged();
+		return UserDataRepository.findByEmail(loginRecord.getEmail());
+  }
 }
