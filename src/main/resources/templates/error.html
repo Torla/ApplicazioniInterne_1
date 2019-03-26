@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>ErrorPage</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+          crossorigin="anonymous">
+</head>
+<body>
+<div class="container bg-light p-3">
+    <div class="bg-dark" style="border-radius: 8pt; display: flex; justify-content: center">
+        <h1 class="text-light">You shouldn't be here!</h1>
+    </div>
+    <img alt="Your daily cat image" th:src="'/images/CatError.jpg'"
+         class="rounded mx-auto d-block img-fluid">
+    <form action="#" th:action="@{/login}">
+        <div class="container p-3" style="display: flex; justify-content: center">
+            <input type="submit" value="Go home" class="btn btn-lg btn-primary">
+        </div>
+    </form>
+</div>
+</body>
+</html>
