@@ -90,6 +90,7 @@ public class UsersMap {
     if (userData == null) throw new EmailDoesntExist();
     if (!userData.getPassword().equals(pswDigest(psw))) throw new WrongPassword();
     LoginRecord loginRecord = new LoginRecord();
+    loginRecord.setUser(UserDataRepository.findByEmail(email));
     loginRecord.setCookie(cookie.getValue());
     loginRecord.setZonedDateTime(ZonedDateTime.now());
     logger.info(ZonedDateTime.now().toString());
