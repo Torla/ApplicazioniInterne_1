@@ -2,27 +2,32 @@ package com.test.demo.db;
 
 import com.test.demo.Entity.LoginRecord;
 import com.test.demo.ViewModels.UserDataVM;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.Cookie;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Component
 public class UsersMap {
 
-	private final UserDataRepository UserDataRepository;
-	private final LoginRecordRepository loginRecordRepository;
+  private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	@Autowired
-	public UsersMap(UserDataRepository repository, LoginRecordRepository loginRecordRepository) {
-		this.UserDataRepository = repository;
-		this.loginRecordRepository = loginRecordRepository;
-	}
+  private final UserDataRepository UserDataRepository;
+  private final LoginRecordRepository loginRecordRepository;
 
-	public class EmailAlreadyExist extends Exception {
+  @Autowired
+  public UsersMap(UserDataRepository repository, LoginRecordRepository loginRecordRepository) {
+    this.UserDataRepository = repository;
+    this.loginRecordRepository = loginRecordRepository;
+  }
+
+  public class EmailAlreadyExist extends Exception {
   }
 
   public class EmailDoesntExist extends Exception {
@@ -32,12 +37,12 @@ public class UsersMap {
 
   }
 
-  public class NotLogged extends Exception{
+  public class NotLogged extends Exception {
 
   }
 
 
-  static private String pswDigest (String psw) {
+  static private String pswDigest(String psw) {
 
     MessageDigest digest = null;
 
@@ -58,7 +63,8 @@ public class UsersMap {
     return hexString.toString();
   }
 
-  public void addUser (String name, String surname, String email, String psw) throws EmailAlreadyExist {
+  @Transactional
+  public void addUser(String name, String surname, String email, String psw) throws EmailAlreadyExist {
     if (UserDataRepository.countByEmail(email) != 0) {
       throw new EmailAlreadyExist();
     }
@@ -71,27 +77,28 @@ public class UsersMap {
     UserDataRepository.save(userData);
   }
 
-  public UserDataVM getUserData (String email) throws EmailDoesntExist {
-	  UserDataVM userDataVM = UserDataRepository.findByEmail(email);
-	  if(userDataVM == null) throw new EmailDoesntExist();
-	  return userDataVM;
+  public UserDataVM getUserData(String email) throws EmailDoesntExist {
+    UserDataVM userDataVM = UserDataRepository.findByEmail(email);
+    if (userDataVM == null) throw new EmailDoesntExist();
+    return userDataVM;
   }
 
-  public void checkLogin (String email, String psw,Cookie cookie) throws EmailDoesntExist, WrongPassword {
+  @Transactional
+  public void checkLogin(String email, String psw, Cookie cookie) throws EmailDoesntExist, WrongPassword {
 
-  	UserDataVM userData = UserDataRepository.findByEmail(email);
-  	if(userData == null) throw new EmailDoesntExist();
+    UserDataVM userData = UserDataRepository.findByEmail(email);
+    if (userData == null) throw new EmailDoesntExist();
     if (!userData.getPassword().equals(pswDigest(psw))) throw new WrongPassword();
     LoginRecord loginRecord = new LoginRecord();
-    loginRecord.setEmail(email);
     loginRecord.setCookie(cookie.getValue());
-    loginRecord.setLocalDateTime(LocalDateTime.now());
+    loginRecord.setZonedDateTime(ZonedDateTime.now());
+    logger.info(ZonedDateTime.now().toString());
     loginRecordRepository.save(loginRecord);
   }
 
   public UserDataVM checkCookie(String cookie) throws NotLogged {
-		LoginRecord loginRecord = loginRecordRepository.findByCookie(cookie);
-		if(loginRecord == null) throw new NotLogged();
-		return UserDataRepository.findByEmail(loginRecord.getEmail());
+    LoginRecord loginRecord = loginRecordRepository.findByCookie(cookie);
+    if (loginRecord == null) throw new NotLogged();
+    return UserDataRepository.findById(loginRecord.getId()).get();
   }
 }

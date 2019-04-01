@@ -8,8 +8,9 @@ import org.springframework.stereotype.Repository;
 
 
 @Repository
-public interface UserDataRepository extends CrudRepository<UserDataVM,Long>{
+public interface UserDataRepository extends CrudRepository<UserDataVM, Long> {
 
-	UserDataVM findByEmail(String email);
-	int countByEmail(String email);
+  UserDataVM findByEmail(String email);
+
+  int countByEmail(String email);
 }

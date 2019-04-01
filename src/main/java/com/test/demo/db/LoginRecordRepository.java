@@ -5,8 +5,10 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface LoginRecordRepository extends CrudRepository<LoginRecord,Long> {
+public interface LoginRecordRepository extends CrudRepository<LoginRecord, Long> {
 
-	LoginRecord findByCookie(String cookie);
+  LoginRecord findByCookie(String cookie);
+
+
 }
 
