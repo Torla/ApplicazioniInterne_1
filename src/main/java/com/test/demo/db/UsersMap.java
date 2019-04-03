@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.servlet.http.Cookie;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -20,11 +22,13 @@ public class UsersMap {
 
   private final UserDataRepository UserDataRepository;
   private final LoginRecordRepository loginRecordRepository;
+  private final EntityManagerFactory entityManagerFactory;
 
   @Autowired
-  public UsersMap(UserDataRepository repository, LoginRecordRepository loginRecordRepository) {
+  public UsersMap(UserDataRepository repository, LoginRecordRepository loginRecordRepository, EntityManagerFactory entityManagerFactory) {
     this.UserDataRepository = repository;
     this.loginRecordRepository = loginRecordRepository;
+    this.entityManagerFactory = entityManagerFactory;
   }
 
   public class EmailAlreadyExist extends Exception {
@@ -63,18 +67,20 @@ public class UsersMap {
     return hexString.toString();
   }
 
-  @Transactional
   public void addUser(String name, String surname, String email, String psw) throws EmailAlreadyExist {
     if (UserDataRepository.countByEmail(email) != 0) {
       throw new EmailAlreadyExist();
     }
 
+    EntityManager entityManager = entityManagerFactory.createEntityManager();
+    entityManager.getTransaction().begin();
     UserDataVM userData = new UserDataVM();
     userData.setEmail(email);
     userData.setName(name);
     userData.setPassword(pswDigest(psw));
     userData.setSurname(surname);
-    UserDataRepository.save(userData);
+    entityManager.persist(userData);
+    entityManager.getTransaction().commit();
   }
 
   public UserDataVM getUserData(String email) throws EmailDoesntExist {
@@ -83,18 +89,19 @@ public class UsersMap {
     return userDataVM;
   }
 
-  @Transactional
   public void checkLogin(String email, String psw, Cookie cookie) throws EmailDoesntExist, WrongPassword {
-
+    EntityManager entityManager = entityManagerFactory.createEntityManager();
+    entityManager.getTransaction().begin();
     UserDataVM userData = UserDataRepository.findByEmail(email);
     if (userData == null) throw new EmailDoesntExist();
     if (!userData.getPassword().equals(pswDigest(psw))) throw new WrongPassword();
     LoginRecord loginRecord = new LoginRecord();
-    loginRecord.setUser(UserDataRepository.findByEmail(email));
+    loginRecord.setUser(userData);
     loginRecord.setCookie(cookie.getValue());
     loginRecord.setZonedDateTime(ZonedDateTime.now());
     logger.info(ZonedDateTime.now().toString());
-    loginRecordRepository.save(loginRecord);
+    entityManager.persist(loginRecord);
+    entityManager.getTransaction().commit();
   }
 
   public UserDataVM checkCookie(String cookie) throws NotLogged {

@@ -14,8 +14,7 @@ public class LoginRecord {
 	@Id
 	@GeneratedValue
 	private Long id;
-	@ManyToOne(fetch = FetchType.LAZY,
-      cascade = CascadeType.ALL)
+	@ManyToOne(fetch = FetchType.LAZY)
 	private UserDataVM user;
 	private String cookie;
 	private ZonedDateTime zonedDateTime;
